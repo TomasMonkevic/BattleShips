@@ -3,6 +3,7 @@ module Moves where
 {-# LANGUAGE OverloadedStrings #-}
 
 import Data.Aeson
+import Data.Vector
 import GHC.Generics
 import Utils
 
@@ -24,10 +25,11 @@ data Moves = Moves {
 -- instance FromJSON Moves
 instance ToJSON Moves where
     toJSON (Moves coords result prev) = 
-        object [ "coord"  .= coords
-            , "result"   .= result
-            , "prev"        .= prev
-            ]
+        Array (fromList [ toJSON "coord",
+            toJSON coords,
+            toJSON "result",
+            toJSON result,
+            toJSON "prev"])
 
 allMoves :: Maybe Moves -> ([(String, String)], [(String, String)])
 allMoves moves = f moves (moveCount moves) ([],[])

@@ -24,6 +24,7 @@ dependencies:
 - bytestring
 - aeson
 - case-insensitive
+- vector
 
 library:
   source-dirs: src
