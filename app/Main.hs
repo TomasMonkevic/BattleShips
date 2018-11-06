@@ -4,7 +4,6 @@ module Main where
 
 import Network.HTTP.Client
 -- import Network.HTTP.Types.Status (statusCode)
-import Data.Aeson (object, (.=), encode)
 import qualified Data.ByteString.Char8 as S8
 import Data.Text (Text)
 import qualified Data.CaseInsensitive as CI
