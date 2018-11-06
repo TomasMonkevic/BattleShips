@@ -1,6 +1,6 @@
 name:                Task2
 version:             0.1.0.0
-github:              ""
+#bitbucket:           ""
 license:             BSD3
 author:              "Tomas Monkevic"
 maintainer:          "tomas.monkevic97@gmail.com"
@@ -19,6 +19,11 @@ description:         No description
 
 dependencies:
 - base >= 4.7 && < 5
+- text
+- http-client
+- bytestring
+- aeson
+- case-insensitive
 
 library:
   source-dirs: src
