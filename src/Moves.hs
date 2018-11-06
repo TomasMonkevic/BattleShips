@@ -5,6 +5,9 @@ module Moves where
 import Data.Aeson
 import Data.Vector
 import GHC.Generics
+import qualified Data.ByteString.Char8 as S8
+import Data.Text as T
+import qualified Data.CaseInsensitive as CI
 import Utils
 
 data ShotType = MISS | HIT
@@ -12,8 +15,8 @@ data ShotType = MISS | HIT
 
 --instance FromJSON ShotType
 instance ToJSON ShotType where
-    toJSON MISS = "MISS"
-    toJSON HIT = "HIT"
+    toJSON MISS = String (T.pack "coord")
+    toJSON HIT = String (T.pack "coord")
 
 data Moves = Moves { 
     coords :: (String, String), 
@@ -25,11 +28,12 @@ data Moves = Moves {
 -- instance FromJSON Moves
 instance ToJSON Moves where
     toJSON (Moves coords result prev) = 
-        Array (fromList [ toJSON "coord",
+        Array (fromList [ String (T.pack "coord"),
             toJSON coords,
-            toJSON "result",
+            String $ T.pack "result",
             toJSON result,
-            toJSON "prev"])
+            String $ T.pack "prev",
+            toJSON prev])
 
 allMoves :: Maybe Moves -> ([(String, String)], [(String, String)])
 allMoves moves = f moves (moveCount moves) ([],[])
