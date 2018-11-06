@@ -1,5 +1,7 @@
 module Main where
 
+{-# LANGUAGE OverloadedStrings #-}
+
 import Network.HTTP.Client
 -- import Network.HTTP.Types.Status (statusCode)
 import Data.Aeson (object, (.=), encode)
@@ -17,9 +19,9 @@ main = do
 
     initialRequest <- parseRequest "http://battleship.haskell.lt/game/tm_test3/player/A"
     let request = initialRequest { 
-        method = (S8.pack "POST"), 
-        requestBody = RequestBodyBS (S8.pack "[\"coord\", [\"B\",\"5\"], \"result\", null,\"prev\", null]"),
-        requestHeaders = [(CI.mk (S8.pack "Content-Type"), S8.pack "application/json+nomaps")]
+        method = ("POST"), 
+        requestBody = RequestBodyBS ("[\"coord\", [\"B\",\"6\"], \"result\", null,\"prev\", null]"),
+        requestHeaders = [("Content-Type", "application/json+nomaps")]
     }
     response <- httpLbs request manager
     -- putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
