@@ -18,7 +18,7 @@ main = do
     initialRequest <- parseRequest "http://battleship.haskell.lt/game/tm_test3/player/A"
     let request = initialRequest { 
         method = (S8.pack "POST"), 
-        requestBody = RequestBodyBS (S8.pack "{\"coord\":[\"B\",\"5\"],\"result\":null,\"prev\":null}"),
+        requestBody = RequestBodyBS (S8.pack "[\"coord\", [\"B\",\"5\"], \"result\", null,\"prev\", null]"),
         requestHeaders = [(CI.mk (S8.pack "Content-Type"), S8.pack "application/json+nomaps")]
     }
     response <- httpLbs request manager
