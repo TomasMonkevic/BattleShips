@@ -3,23 +3,23 @@ module Main where
 {-# LANGUAGE OverloadedStrings #-}
 
 import Network.HTTP.Client
+import Data.Aeson
 -- import Network.HTTP.Types.Status (statusCode)
 import qualified Data.ByteString.Char8 as S8
 import Data.Text (Text)
 import qualified Data.CaseInsensitive as CI
+import Moves
 
 main :: IO ()
 main = do
     manager <- newManager defaultManagerSettings
 
-    -- Create the request
-    -- let requestObject = object ["name" .= "Michael", "age" .= 30]
-    -- let requestObject = object [ "name" .= ("Michael" :: Text) , "age"  .= (30 :: Int) ]
+    let testMoves = Moves ("D","3") (Just HIT)  (Just $ Moves ("A", "6") Nothing Nothing)
 
     initialRequest <- parseRequest "http://battleship.haskell.lt/game/tm_test3/player/A"
     let request = initialRequest { 
         method = ("POST"), 
-        requestBody = RequestBodyBS ("[\"coord\", [\"B\",\"6\"], \"result\", null,\"prev\", null]"),
+        requestBody = RequestBodyLBS ( encode testMoves),
         requestHeaders = [("Content-Type", "application/json+nomaps")]
     }
     response <- httpLbs request manager
