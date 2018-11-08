@@ -9,6 +9,7 @@ import Data.Text as T
 import qualified Data.CaseInsensitive as CI
 import Control.Monad
 import Utils
+import Data.Aeson.Types
 
 data ShotType = MISS | HIT
     deriving (Show, Eq)
@@ -30,10 +31,15 @@ data Moves = Moves {
     deriving Show
 
 instance FromJSON Moves where
-    parseJSON (Object v) =
-        Moves <$> v .: "coord"
-            <*> v .: "result"
-            <*> v .: "prev"
+    parseJSON (Array v) = f (toList v) 
+        where
+            f :: [Value] -> Parser Moves
+            f (cs:c:rs:r:ps:p:xs) = do
+                _c <- parseJSON c
+                _r <- parseJSON r
+                _p <- parseJSON p
+                return $ Moves _c _r _p
+            f [] = mzero
     parseJSON _ = mzero
 
 instance ToJSON Moves where
