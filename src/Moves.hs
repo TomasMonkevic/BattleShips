@@ -7,12 +7,17 @@ import Data.Vector
 import qualified Data.ByteString.Char8 as S8
 import Data.Text as T
 import qualified Data.CaseInsensitive as CI
+import Control.Monad
 import Utils
 
 data ShotType = MISS | HIT
     deriving (Show, Eq)
 
---instance FromJSON ShotType
+instance FromJSON ShotType where
+    parseJSON (String "HIT") = return HIT
+    parseJSON (String "MISS") = return MISS
+    parseJSON _ = mzero
+
 instance ToJSON ShotType where
     toJSON MISS = String (T.pack "MISS")
     toJSON HIT = String (T.pack "HIT")
@@ -24,7 +29,13 @@ data Moves = Moves {
 }
     deriving Show
 
--- instance FromJSON Moves
+instance FromJSON Moves where
+    parseJSON (Object v) =
+        Moves <$> v .: "coord"
+            <*> v .: "result"
+            <*> v .: "prev"
+    parseJSON _ = mzero
+
 instance ToJSON Moves where
     toJSON (Moves coords result prev) = 
         Array (fromList [ String $ T.pack "coord",
