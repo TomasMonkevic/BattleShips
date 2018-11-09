@@ -11,6 +11,7 @@ import Control.Monad
 import Utils
 import Data.List as L
 import Data.Aeson.Types
+import System.Random
 
 data ShotType = MISS | HIT
     deriving (Show, Eq)
@@ -107,3 +108,8 @@ score moves = f moves (moveCount moves) (0,0)
                     f p (player + 1) (playerOneScore, playerTwoScore + 1)
             else
                 f p (player + 1) (playerOneScore, playerTwoScore)
+
+getNextMove :: [(String, String)] -> IO (String, String)
+getNextMove am = do
+    g <- getStdGen
+    return $ am !! (fst (randomR (0, L.length am) g))
