@@ -5,11 +5,17 @@ import qualified Data.ByteString.Lazy.Char8 as LS8
 import Data.Text (Text)
 import qualified Data.CaseInsensitive as CI
 
-httpPost :: LS8.ByteString -> IO LS8.ByteString
-httpPost json = do
+gameUrl :: String
+gameUrl = "http://battleship.haskell.lt/game/"
+
+gameId :: String
+gameId = "tm_test4"
+
+httpPost :: [Char] -> LS8.ByteString -> IO LS8.ByteString
+httpPost player json = do
     manager <- newManager defaultManagerSettings
 
-    initialRequest <- parseRequest "http://battleship.haskell.lt/game/tm_test3/player/A"
+    initialRequest <- parseRequest (gameUrl ++ gameId ++ "/player/" ++ player)
     let request = initialRequest { 
         method = ("POST"), 
         requestBody = RequestBodyLBS json,
@@ -18,11 +24,11 @@ httpPost json = do
     response <- httpLbs request manager
     return $ responseBody response
 
-httpGet :: IO LS8.ByteString
-httpGet = do
+httpGet :: [Char] -> IO LS8.ByteString
+httpGet player = do
     manager <- newManager defaultManagerSettings
 
-    initialRequest <- parseRequest "http://battleship.haskell.lt/game/tm_test3/player/B"
+    initialRequest <- parseRequest (gameUrl ++ gameId ++ "/player/" ++ player)
     let request = initialRequest { 
         method = ("GET"), 
         requestHeaders = [("Accept", "application/json+nomaps")]
