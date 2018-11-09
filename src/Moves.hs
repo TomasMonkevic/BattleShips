@@ -9,6 +9,7 @@ import Data.Text as T
 import qualified Data.CaseInsensitive as CI
 import Control.Monad
 import Utils
+import Data.List as L
 import Data.Aeson.Types
 
 data ShotType = MISS | HIT
@@ -76,3 +77,33 @@ areMovesValid moves =
         m = allMoves moves
     in
         (allUnique (fst m)) && (allUnique (snd m))
+
+board :: [(String, String)]
+board = do
+    x <- ['A'..'J']
+    y <- [1..10]
+    return ([x], show y)
+
+availableMoves :: Maybe Moves -> Integer -> [(String, String)]
+availableMoves moves player = 
+    let 
+        playerMoves = if player == 0 then fst $ allMoves moves else snd $ allMoves moves
+    in
+        L.filter (f playerMoves) board
+        where
+            f :: [(String, String)] -> (String, String) -> Bool
+            f pm c = L.notElem c pm
+
+score :: Maybe Moves -> (Integer, Integer)
+score moves = f moves (moveCount moves) (0,0)
+    where 
+        f :: Maybe Moves -> Integer -> (Integer, Integer) -> (Integer, Integer)
+        f Nothing _ acc = acc
+        f (Just Moves { result = r, prev = p}) player (playerOneScore, playerTwoScore) = 
+            if r == Just HIT then
+                if player `mod` 2 == 0 then --when ship was hit, second players seys HIT, the score is increase for the first player and vice versa
+                    f p (player + 1) (playerOneScore + 1, playerTwoScore)
+                else
+                    f p (player + 1) (playerOneScore, playerTwoScore + 1)
+            else
+                f p (player + 1) (playerOneScore, playerTwoScore)
