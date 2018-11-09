@@ -9,7 +9,7 @@ gameUrl :: String
 gameUrl = "http://battleship.haskell.lt/game/"
 
 gameId :: String
-gameId = "tm_test4"
+gameId = "tm_test5"
 
 httpPost :: [Char] -> LS8.ByteString -> IO LS8.ByteString
 httpPost player json = do
