@@ -17,3 +17,15 @@ httpPost json = do
     }
     response <- httpLbs request manager
     return $ responseBody response
+
+httpGet :: IO LS8.ByteString
+httpGet = do
+    manager <- newManager defaultManagerSettings
+
+    initialRequest <- parseRequest "http://battleship.haskell.lt/game/tm_test3/player/B"
+    let request = initialRequest { 
+        method = ("GET"), 
+        requestHeaders = [("Accept", "application/json+nomaps")]
+    }
+    response <- httpLbs request manager
+    return $ responseBody response
