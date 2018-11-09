@@ -20,8 +20,8 @@ instance FromJSON ShotType where
     parseJSON _ = mzero
 
 instance ToJSON ShotType where
-    toJSON MISS = String (T.pack "MISS")
-    toJSON HIT = String (T.pack "HIT")
+    toJSON MISS = String "MISS"
+    toJSON HIT = String "HIT"
 
 data Moves = Moves { 
     coords :: (String, String), 
@@ -44,11 +44,11 @@ instance FromJSON Moves where
 
 instance ToJSON Moves where
     toJSON (Moves coords result prev) = 
-        Array (fromList [ String $ T.pack "coord",
+        Array (fromList [ String "coord",
             toJSON coords,
-            String $ T.pack "result",
+            String "result",
             toJSON result,
-            String $ T.pack "prev",
+            String "prev",
             toJSON prev])
 
 allMoves :: Maybe Moves -> ([(String, String)], [(String, String)])

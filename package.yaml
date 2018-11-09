@@ -28,16 +28,18 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+    - -XOverloadedStrings
 
 executables:
   Task2-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
+    - -XOverloadedStrings
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - -XOverloadedStrings
     dependencies:
     - Task2
 
