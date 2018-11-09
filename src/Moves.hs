@@ -111,5 +111,5 @@ score moves = f moves (moveCount moves) (0,0)
 
 getNextMove :: [(String, String)] -> IO (String, String)
 getNextMove am = do
-    g <- getStdGen
+    g <- newStdGen
     return $ am !! (fst (randomR (0, L.length am) g))
