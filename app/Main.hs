@@ -6,19 +6,27 @@ import Data.Aeson
 import Moves
 import Http
 
+play :: Integer -> String -> Maybe Moves -> IO()
+play turn player m = do
+    if turn == 0
+    then do
+        moveCoord <- getNextMove $ availableMoves m (if player == "A" then 0 else 1)
+        let move = Moves moveCoord (isHit m) m
+        postResponse <- httpPost player (encode move)
+        print postResponse
+        print move
+        play 1 player (Just move)
+    else do
+        getResponse <- (httpGet player)
+        print getResponse
+        let getMoves = decode getResponse :: Maybe Moves
+        play 0 player getMoves
+
 main :: IO ()
 main = do
-    move <- getNextMove $ availableMoves Nothing 0
-    let firstMove = Moves move Nothing Nothing
-    postResponse <- httpPost "A" (encode firstMove)
-    print postResponse
-    getResponse <- (httpGet "B")
-    print getResponse
-
-    let getMoves = decode getResponse :: Maybe Moves
-    move2 <- getNextMove $ availableMoves getMoves 1
-    let opa = Moves move2 (Just MISS) getMoves
-    postResponse2 <- httpPost "B" (encode opa)
-    print postResponse2
-    getResponse2 <- (httpGet "A")
-    print getResponse2
+    line <- getLine
+    if line == "A"
+        then
+            play 0 "A" Nothing
+        else
+            play 1 "B" Nothing

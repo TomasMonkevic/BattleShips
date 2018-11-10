@@ -113,3 +113,7 @@ getNextMove :: [(String, String)] -> IO (String, String)
 getNextMove am = do
     g <- newStdGen
     return $ am !! (fst (randomR (0, L.length am) g))
+
+isHit :: Maybe Moves -> Maybe ShotType
+isHit Nothing = Nothing
+isHit m = Just MISS
