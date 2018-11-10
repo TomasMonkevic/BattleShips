@@ -112,7 +112,7 @@ score moves = f moves (moveCount moves) (0,0)
 getNextMove :: [(String, String)] -> IO (String, String)
 getNextMove am = do
     g <- newStdGen
-    return $ am !! (fst (randomR (0, L.length am) g))
+    return $ am !! ((fst (randomR (1, L.length am) g)) - 1)
 
 isHit :: Maybe Moves -> Maybe ShotType
 isHit Nothing = Nothing
