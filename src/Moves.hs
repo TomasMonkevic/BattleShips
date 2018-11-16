@@ -26,7 +26,7 @@ instance ToJSON ShotType where
     toJSON HIT = String "HIT"
 
 data Moves = Moves { 
-    coords :: (String, String), 
+    coords :: Maybe (String, String), 
     result :: Maybe ShotType, 
     prev :: Maybe Moves 
 }
@@ -53,10 +53,10 @@ instance ToJSON Moves where
             String "prev",
             toJSON prev])
 
-allMoves :: Maybe Moves -> ([(String, String)], [(String, String)])
+allMoves :: Maybe Moves -> ([Maybe (String, String)], [Maybe (String, String)])
 allMoves moves = f moves (moveCount moves) ([],[])
     where 
-        f :: Maybe Moves -> Integer -> ([(String, String)], [(String, String)]) -> ([(String, String)], [(String, String)])
+        f :: Maybe Moves -> Integer -> ([Maybe (String, String)], [Maybe (String, String)]) -> ([Maybe (String, String)], [Maybe (String, String)])
         f Nothing _ acc = acc
         f (Just Moves { coords = c, prev = p}) player (playerOneMoves, playerTwoScore) = 
             if player `mod` 2 == 0 then
@@ -79,20 +79,20 @@ areMovesValid moves =
     in
         (allUnique (fst m)) && (allUnique (snd m))
 
-board :: [(String, String)]
+board :: [Maybe (String, String)]
 board = do
     x <- ['A'..'J']
     y <- [1..10]
-    return ([x], show y)
+    return (Just ([x], show y))
 
-availableMoves :: Maybe Moves -> Integer -> [(String, String)]
+availableMoves :: Maybe Moves -> Integer -> [Maybe (String, String)]
 availableMoves moves player = 
     let 
         playerMoves = if player == 0 then fst $ allMoves moves else snd $ allMoves moves
     in
         L.filter (f playerMoves) board
         where
-            f :: [(String, String)] -> (String, String) -> Bool
+            f :: [Maybe (String, String)] -> Maybe (String, String) -> Bool
             f pm c = L.notElem c pm
 
 score :: Maybe Moves -> (Integer, Integer)
@@ -109,7 +109,7 @@ score moves = f moves (moveCount moves) (0,0)
             else
                 f p (player + 1) (playerOneScore, playerTwoScore)
 
-getNextMove :: [(String, String)] -> IO (String, String)
+getNextMove :: [Maybe (String, String)] -> IO (Maybe (String, String))
 getNextMove am = do
     g <- newStdGen
     return $ am !! (fst (randomR (0, (L.length am) - 1) g))
