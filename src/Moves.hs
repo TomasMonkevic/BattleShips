@@ -30,7 +30,7 @@ data Moves = Moves {
     result :: Maybe ShotType, 
     prev :: Maybe Moves 
 }
-    deriving Show
+    deriving (Show, Eq)
 
 instance FromJSON Moves where
     parseJSON (Array v) = f (toList v) 
