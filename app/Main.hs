@@ -6,6 +6,33 @@ import Data.Aeson
 import Moves
 import Http
 
+shipCoords :: [(String, String)]
+shipCoords = [
+    ("A", "1"), ----
+    ("A", "2"), ----
+    ("B", "1"),
+    ("B", "2"),
+
+    ("A", "10"), --------
+    ("B", "10"),
+    ("C", "10"),
+    ("D", "10"),
+
+    ("D", "1"), ----
+    ("E", "1"),   ----
+    ("E", "2"),
+    ("F", "2"),
+
+    ("H", "1"), -------
+    ("I", "1"),      --
+    ("J", "1"),
+    ("J", "2"),
+
+    ("H", "10"),   --
+    ("I", "10"), ------
+    ("I", "9"),
+    ("J", "10")]
+
 play :: Integer -> String -> Maybe Moves -> IO()
 play turn player m = do
     if turn == 0
