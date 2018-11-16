@@ -60,6 +60,12 @@ isHit :: Maybe Moves -> Maybe ShotType
 isHit Nothing = Nothing
 isHit m = Just MISS
 
+isGameOver :: Maybe Moves -> Bool
+isGameOver Nothing = False
+isGameOver (Just Moves { coords = c}) = case c of
+    Nothing -> True
+    Just (c1) -> False
+
 play :: Integer -> String -> Maybe Moves -> IO()
 play turn player m = do
     if turn == 0
@@ -83,4 +89,8 @@ play turn player m = do
         else do
             print getResponse
             let getMoves = decode getResponse :: Maybe Moves
-            play 0 player getMoves
+            if isGameOver getMoves 
+            then
+                putStrLn "I won :)"
+            else 
+                play 0 player getMoves
