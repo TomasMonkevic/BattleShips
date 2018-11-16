@@ -11,7 +11,6 @@ import Control.Monad
 import Utils
 import Data.List as L
 import Data.Aeson.Types
-import System.Random
 
 data ShotType = MISS | HIT
     deriving (Show, Eq)
@@ -79,22 +78,6 @@ areMovesValid moves =
     in
         (allUnique (fst m)) && (allUnique (snd m))
 
-board :: [Maybe (String, String)]
-board = do
-    x <- ['A'..'J']
-    y <- [1..10]
-    return (Just ([x], show y))
-
-availableMoves :: Maybe Moves -> Integer -> [Maybe (String, String)]
-availableMoves moves player = 
-    let 
-        playerMoves = if player == 0 then fst $ allMoves moves else snd $ allMoves moves
-    in
-        L.filter (f playerMoves) board
-        where
-            f :: [Maybe (String, String)] -> Maybe (String, String) -> Bool
-            f pm c = L.notElem c pm
-
 score :: Maybe Moves -> (Integer, Integer)
 score moves = f moves (moveCount moves) (0,0)
     where 
@@ -108,12 +91,3 @@ score moves = f moves (moveCount moves) (0,0)
                     f p (player + 1) (playerOneScore, playerTwoScore + 1)
             else
                 f p (player + 1) (playerOneScore, playerTwoScore)
-
-getNextMove :: [Maybe (String, String)] -> IO (Maybe (String, String))
-getNextMove am = do
-    g <- newStdGen
-    return $ am !! (fst (randomR (0, (L.length am) - 1) g))
-
-isHit :: Maybe Moves -> Maybe ShotType
-isHit Nothing = Nothing
-isHit m = Just MISS
