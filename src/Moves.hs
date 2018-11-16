@@ -39,7 +39,7 @@ instance FromJSON Moves where
                 _c <- parseJSON c
                 _r <- parseJSON r
                 _p <- parseJSON p
-                return $ Moves _c _r _p
+                return $ Moves (arrayToTuple _c) _r _p
             f [] = mzero
     parseJSON _ = mzero
 
@@ -51,6 +51,10 @@ instance ToJSON Moves where
             toJSON result,
             String "prev",
             toJSON prev])
+
+arrayToTuple :: [a] -> Maybe (a,a)
+arrayToTuple [] = Nothing
+arrayToTuple (a1:a2:t) = Just (a1,a2)
 
 allMoves :: Maybe Moves -> ([Maybe (String, String)], [Maybe (String, String)])
 allMoves moves = f moves (moveCount moves) ([],[])
