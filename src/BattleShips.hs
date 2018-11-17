@@ -68,8 +68,14 @@ isGameOver (Just Moves { coords = c}) = case c of
     Nothing -> True
     Just (c1) -> False
 
-play :: Integer -> String -> Maybe Moves -> IO()
-play turn player m = do
+damageShip :: Maybe Moves -> [(String, String)] -> [(String, String)]
+damageShip Nothing as = as
+damageShip (Just Moves { coords = c}) as = case c of
+    Nothing -> as
+    Just (c1) -> delete c1 as
+
+play :: Integer -> String -> Maybe Moves -> [(String, String)] -> IO()
+play turn player m aliveShips = do
     if turn == 0
     then do
         let am = availableMoves m (if player == "A" then 0 else 1)
@@ -77,12 +83,18 @@ play turn player m = do
             [] -> do 
                 return ()
             am2 -> do
-                moveCoord <- getNextMove am2
-                let move = Moves moveCoord (isHit m) m
-                postResponse <- httpPost player (encode move)
-                print postResponse
-                print move
-                play 1 player (Just move)
+                case aliveShips of
+                    [] -> do
+                        let move = Moves Nothing (isHit m) m
+                        httpPost player (encode move)
+                        putStrLn "I lost :("
+                    as -> do
+                        moveCoord <- getNextMove am2
+                        let move = Moves moveCoord (isHit m) m
+                        postResponse <- httpPost player (encode move)
+                        print postResponse
+                        print move
+                        play 1 player (Just move) (damageShip m as)
     else do
         getResponse <- (httpGet player)
         if getResponse == "No move available at the moment"
@@ -95,4 +107,4 @@ play turn player m = do
             then
                 putStrLn "I won :)"
             else 
-                play 0 player getMoves
+                play 0 player getMoves aliveShips

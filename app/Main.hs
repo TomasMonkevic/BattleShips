@@ -12,6 +12,6 @@ main = do
     line <- getLine
     if line == "A"
         then
-            play 0 "A" Nothing
+            play 0 "A" Nothing shipCoords
         else
-            play 1 "B" Nothing
+            play 1 "B" Nothing shipCoords
