@@ -8,6 +8,12 @@ import Http
 import Data.List as L
 import System.Random
 
+gameUrl :: String
+gameUrl = "http://battleship.haskell.lt/game/"
+
+gameId :: String
+gameId = "tm_test24"
+
 shipCoords :: [(String, String)]
 shipCoords = [
     ("A", "1"), ----
@@ -87,7 +93,7 @@ play turn player m aliveShips = do
                 case aliveShips of
                     [] -> do
                         let move = Moves Nothing (isHit m) m
-                        httpPost player (encode move)
+                        httpPost player (encode move) gameUrl gameId
                         putStrLn "\nPOST: "
                         print move
                         putStrLn "I lost :( | Score: "
@@ -95,12 +101,12 @@ play turn player m aliveShips = do
                     as -> do
                         moveCoord <- getNextMove am2
                         let move = Moves moveCoord (isHit m) m
-                        httpPost player (encode move)
+                        httpPost player (encode move) gameUrl gameId
                         putStrLn "\nPOST: "
                         print move
                         play 1 player (Just move) (damageShip m as)
     else do
-        getResponse <- (httpGet player)
+        getResponse <- (httpGet player gameUrl gameId)
         putStrLn "\nGET: "
         print getResponse
         if getResponse == "No move available at the moment"
