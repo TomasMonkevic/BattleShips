@@ -9,6 +9,7 @@ import BattleShips
 
 main :: IO ()
 main = do
+    putStrLn "Enter player type (A or B): "
     line <- getLine
     if line == "A"
         then

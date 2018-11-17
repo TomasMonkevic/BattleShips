@@ -81,27 +81,31 @@ play turn player m aliveShips = do
         let am = availableMoves m (if player == "A" then 0 else 1)
         case am of 
             [] -> do 
+                putStrLn "It's a draw :|"
                 return ()
             am2 -> do
                 case aliveShips of
                     [] -> do
                         let move = Moves Nothing (isHit m) m
                         httpPost player (encode move)
+                        putStrLn "\nPOST: "
+                        print move
                         putStrLn "I lost :("
                     as -> do
                         moveCoord <- getNextMove am2
                         let move = Moves moveCoord (isHit m) m
-                        postResponse <- httpPost player (encode move)
-                        print postResponse
+                        httpPost player (encode move)
+                        putStrLn "\nPOST: "
                         print move
                         play 1 player (Just move) (damageShip m as)
     else do
         getResponse <- (httpGet player)
+        putStrLn "\nGET: "
+        print getResponse
         if getResponse == "No move available at the moment"
         then do
             return ()
         else do
-            print getResponse
             let getMoves = decode getResponse :: Maybe Moves
             if isGameOver getMoves 
             then
