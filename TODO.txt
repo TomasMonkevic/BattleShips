@@ -1,4 +1,0 @@
-- test (send post ang receive get or moves functions???)
-- say correct result (HIT / MISS)
-- end game when all moves are gone or coords is empty
-- find partner 
