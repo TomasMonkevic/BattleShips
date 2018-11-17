@@ -90,7 +90,8 @@ play turn player m aliveShips = do
                         httpPost player (encode move)
                         putStrLn "\nPOST: "
                         print move
-                        putStrLn "I lost :("
+                        putStrLn "I lost :( | Score: "
+                        print $ score (Just move)
                     as -> do
                         moveCoord <- getNextMove am2
                         let move = Moves moveCoord (isHit m) m
@@ -108,7 +109,8 @@ play turn player m aliveShips = do
         else do
             let getMoves = decode getResponse :: Maybe Moves
             if isGameOver getMoves 
-            then
-                putStrLn "I won :)"
-            else 
+            then do
+                putStrLn "I won :) | Score: "
+                print $ score m
+            else do
                 play 0 player getMoves aliveShips
