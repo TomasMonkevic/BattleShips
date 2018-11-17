@@ -58,7 +58,9 @@ getNextMove am = do
 
 isHit :: Maybe Moves -> Maybe ShotType
 isHit Nothing = Nothing
-isHit m = Just MISS
+isHit (Just Moves {coords = c}) = case c of
+    Nothing -> Nothing
+    Just (c1) -> if elem c1 shipCoords then Just HIT else Just MISS
 
 isGameOver :: Maybe Moves -> Bool
 isGameOver Nothing = False
