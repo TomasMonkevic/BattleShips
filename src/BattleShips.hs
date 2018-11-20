@@ -12,7 +12,7 @@ gameUrl :: String
 gameUrl = "http://battleship.haskell.lt/game/"
 
 gameId :: String
-gameId = "tm_test24"
+gameId = "tm_test41"
 
 shipCoords :: [(String, String)]
 shipCoords = [
@@ -80,6 +80,10 @@ damageShip (Just Moves { coords = c}) as = case c of
     Nothing -> as
     Just (c1) -> delete c1 as
 
+getCoords :: Maybe Moves -> Maybe (String, String)
+getCoords Nothing = Nothing
+getCoords (Just Moves { coords = c}) = c
+
 play :: Integer -> String -> Maybe Moves -> [(String, String)] -> IO()
 play turn player m aliveShips = do
     if turn == 0
@@ -95,7 +99,6 @@ play turn player m aliveShips = do
                         let move = Moves Nothing (isHit m) m
                         httpPost player (encode move) gameUrl gameId
                         putStrLn "\nPOST: "
-                        print move
                         putStrLn "I lost :( | Score: "
                         print $ score (Just move)
                     as -> do
@@ -103,20 +106,28 @@ play turn player m aliveShips = do
                         let move = Moves moveCoord (isHit m) m
                         httpPost player (encode move) gameUrl gameId
                         putStrLn "\nPOST: "
-                        print move
-                        play 1 player (Just move) (damageShip m as)
+                        print (isHit m)
+                        print moveCoord
+                        -- if (isHit m) == (Just HIT) 
+                        -- then do 
+                        --     print as
+                        -- else do 
+                        --     putStrLn ""
+                        play 1 player (Just move) as
     else do
         getResponse <- (httpGet player gameUrl gameId)
         putStrLn "\nGET: "
-        print getResponse
+        -- print getResponse
         if getResponse == "No move available at the moment"
         then do
+            putStrLn "WTF"
             return ()
         else do
             let getMoves = decode getResponse :: Maybe Moves
+            print $ getCoords getMoves
             if isGameOver getMoves 
             then do
                 putStrLn "I won :) | Score: "
-                print $ score m
+                print $ score getMoves
             else do
-                play 0 player getMoves aliveShips
+                play 0 player getMoves (damageShip getMoves aliveShips)
