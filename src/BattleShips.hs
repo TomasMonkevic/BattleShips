@@ -12,7 +12,8 @@ gameUrl :: String
 gameUrl = "http://battleship.haskell.lt/game/"
 
 gameId :: String
-gameId = "tm_test41"
+gameId = "tm_justas_12"
+-- gameId = "tm_test41"
 
 shipCoords :: [(String, String)]
 shipCoords = [
@@ -101,6 +102,7 @@ play turn player m aliveShips = do
                         putStrLn "\nPOST: "
                         putStrLn "I lost :( | Score: "
                         print $ score (Just move)
+                        print $ moveCount (Just move)
                     as -> do
                         moveCoord <- getNextMove am2
                         let move = Moves moveCoord (isHit m) m
@@ -129,5 +131,6 @@ play turn player m aliveShips = do
             then do
                 putStrLn "I won :) | Score: "
                 print $ score getMoves
+                print $ moveCount getMoves
             else do
                 play 0 player getMoves (damageShip getMoves aliveShips)
