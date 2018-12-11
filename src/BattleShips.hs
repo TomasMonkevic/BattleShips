@@ -86,11 +86,12 @@ getCoords :: Maybe Moves -> Maybe (String, String)
 getCoords Nothing = Nothing
 getCoords (Just Moves { coords = c}) = c
 
-play :: Maybe Moves -> [(String, String)] -> LS8.ByteString
+play :: Maybe Moves -> [(String, String)] -> IO (LS8.ByteString)
 play m aliveShips =
     case (availableMoves m 1) of 
-        [] -> "It's a draw :|"
+        [] -> return "It's a draw :|"
         am2 -> case aliveShips of
-                [] -> encode (Moves Nothing (isHit m) m)
-                --how the fuck do I shoot to random position if that is an IO function?
-                as -> encode (Moves (Just ("A", "1")) (isHit m) m)
+                [] -> return $ encode (Moves Nothing (isHit m) m)
+                as -> do
+                    nextMove <- getNextMove am2
+                    return $ encode (Moves nextMove (isHit m) m)

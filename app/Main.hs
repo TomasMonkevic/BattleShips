@@ -21,6 +21,7 @@ module Main where
 
 import Web.Scotty
 import Data.Text.Lazy.Encoding
+import Control.Monad.IO.Class
 
 import Data.Aeson
 import Moves
@@ -39,4 +40,5 @@ main = scotty 3000 $
       else do
           -- don't forget to damage ship  
           -- raw (play 0 player getMoves (damageShip getMoves aliveShips))
-          raw (play getMoves shipCoords)
+          response <- liftIO (play getMoves shipCoords)
+          raw response

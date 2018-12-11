@@ -28,6 +28,7 @@ dependencies:
 - random
 - hspec
 - scotty
+- transformers
 
 library:
   source-dirs: src
