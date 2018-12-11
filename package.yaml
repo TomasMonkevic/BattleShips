@@ -27,6 +27,7 @@ dependencies:
 - vector
 - random
 - hspec
+- scotty
 
 library:
   source-dirs: src

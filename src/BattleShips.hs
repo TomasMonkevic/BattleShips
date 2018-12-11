@@ -7,6 +7,7 @@ import Moves
 import Http
 import Data.List as L
 import System.Random
+import qualified Data.ByteString.Lazy.Char8 as LS8
 
 gameUrl :: String
 gameUrl = "http://battleship.haskell.lt/game/"
@@ -85,52 +86,11 @@ getCoords :: Maybe Moves -> Maybe (String, String)
 getCoords Nothing = Nothing
 getCoords (Just Moves { coords = c}) = c
 
-play :: Integer -> String -> Maybe Moves -> [(String, String)] -> IO()
-play turn player m aliveShips = do
-    if turn == 0
-    then do
-        let am = availableMoves m (if player == "A" then 0 else 1)
-        case am of 
-            [] -> do 
-                putStrLn "It's a draw :|"
-                return ()
-            am2 -> do
-                case aliveShips of
-                    [] -> do
-                        let move = Moves Nothing (isHit m) m
-                        httpPost player (encode move) gameUrl gameId
-                        putStrLn "\nPOST: "
-                        putStrLn "I lost :( | Score: "
-                        print $ score (Just move)
-                        print $ moveCount (Just move)
-                    as -> do
-                        moveCoord <- getNextMove am2
-                        let move = Moves moveCoord (isHit m) m
-                        httpPost player (encode move) gameUrl gameId
-                        putStrLn "\nPOST: "
-                        print (isHit m)
-                        print moveCoord
-                        -- if (isHit m) == (Just HIT) 
-                        -- then do 
-                        --     print as
-                        -- else do 
-                        --     putStrLn ""
-                        play 1 player (Just move) as
-    else do
-        getResponse <- (httpGet player gameUrl gameId)
-        putStrLn "\nGET: "
-        -- print getResponse
-        if getResponse == "No move available at the moment"
-        then do
-            putStrLn "WTF"
-            return ()
-        else do
-            let getMoves = decode getResponse :: Maybe Moves
-            print $ getCoords getMoves
-            if isGameOver getMoves 
-            then do
-                putStrLn "I won :) | Score: "
-                print $ score getMoves
-                print $ moveCount getMoves
-            else do
-                play 0 player getMoves (damageShip getMoves aliveShips)
+play :: Maybe Moves -> [(String, String)] -> LS8.ByteString
+play m aliveShips =
+    case (availableMoves m 1) of 
+        [] -> "It's a draw :|"
+        am2 -> case aliveShips of
+                [] -> encode (Moves Nothing (isHit m) m)
+                --how the fuck do I shoot to random position if that is an IO function?
+                as -> encode (Moves (Just ("A", "1")) (isHit m) m)
