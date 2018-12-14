@@ -29,16 +29,25 @@ import BattleShips
 
 import Data.Monoid (mconcat)
 
-main = scotty 3000 $
-  get "/game/:gameId" $ do
-    --gameId <- param "gameId"
-    b <- body
-    let getMoves = decode b :: Maybe Moves
-    if isGameOver getMoves 
-      then do
-          raw "Get fucked! I won :)"
-      else do
-          -- don't forget to damage ship  
-          -- raw (play 0 player getMoves (damageShip getMoves aliveShips))
-          response <- liftIO (play getMoves shipCoords)
-          raw response
+attack :: ActionM ()
+attack = do
+  raw "Attack!"
+
+defend :: ActionM ()
+defend = do
+  --gameId <- param "gameId"
+  b <- body
+  let getMoves = decode b :: Maybe Moves
+  if isGameOver getMoves 
+    then do
+        raw "Get fucked! I won :)"
+    else do
+        -- don't forget to damage ship  
+        -- raw (play 0 player getMoves (damageShip getMoves aliveShips))
+        response <- liftIO (play getMoves shipCoords)
+        raw response
+
+main = scotty 3000 $ do
+  get "/game/:gameId" attack
+  post "/game/:gameId" defend
+
