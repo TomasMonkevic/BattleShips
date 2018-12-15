@@ -29,10 +29,10 @@ import BattleShips
 
 import qualified Data.ByteString.Lazy.Char8 as LS8
 
-newtype AppState = AppState { tickCount :: LS8.ByteString }
+newtype AppState = AppState { tickCount :: (LS8.ByteString, [(String, String)]) }
 
 instance Default AppState where
-    def = AppState LS8.empty
+    def = AppState (LS8.empty, shipCoords)
 
 -- Why 'ReaderT (TVar AppState)' rather than 'StateT AppState'?
 -- With a state transformer, 'runActionToIO' (below) would have
@@ -72,8 +72,8 @@ app :: ScottyT Text WebM ()
 app = do
     middleware logStdoutDev
     get "/game/:gameId" $ do
-        c <- webM $ gets tickCount
-        raw c
+        (moves, availableShips) <- webM $ gets tickCount
+        raw moves
 
     post "/game/:gameId" $ do
         b <- body
@@ -84,6 +84,7 @@ app = do
             else do
                 -- don't forget to damage ship  
                 -- raw (play 0 player getMoves (damageShip getMoves aliveShips))
-                response <- liftIO (play getMoves shipCoords)
-                webM $ modify $ \ st -> st { tickCount = response }
+                (moves, aliveShips) <- webM $ gets tickCount
+                response <- liftIO (play getMoves (damageShip getMoves aliveShips))
+                webM $ modify $ \ st -> st { tickCount = (response, (damageShip getMoves aliveShips)) }
                 raw response
