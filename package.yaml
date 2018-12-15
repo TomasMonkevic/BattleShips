@@ -29,6 +29,10 @@ dependencies:
 - hspec
 - scotty
 - transformers
+- stm
+- mtl
+- data-default-class
+- wai-extra
 
 library:
   source-dirs: src
