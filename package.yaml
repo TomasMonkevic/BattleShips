@@ -33,6 +33,7 @@ dependencies:
 - mtl
 - data-default-class
 - wai-extra
+- containers
 
 library:
   source-dirs: src

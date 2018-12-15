@@ -28,11 +28,12 @@ import Moves
 import BattleShips
 
 import qualified Data.ByteString.Lazy.Char8 as LS8
+import qualified Data.Map.Strict as Map
 
-newtype AppState = AppState { tickCount :: (LS8.ByteString, [(String, String)]) }
+newtype AppState = AppState { tickCount :: Map.Map Text (LS8.ByteString, [(String, String)]) }
 
 instance Default AppState where
-    def = AppState (LS8.empty, shipCoords)
+    def = AppState Map.empty
 
 -- Why 'ReaderT (TVar AppState)' rather than 'StateT AppState'?
 -- With a state transformer, 'runActionToIO' (below) would have
@@ -72,8 +73,12 @@ app :: ScottyT Text WebM ()
 app = do
     middleware logStdoutDev
     get "/game/:gameId" $ do
-        (moves, availableShips) <- webM $ gets tickCount
-        raw moves
+        gameId <- param "gameId"
+        battlesStates <- webM $ gets tickCount
+        let battleState = Map.lookup gameId battlesStates
+        case battleState of
+            Nothing -> raw "No moves were made!"
+            Just (moves, aliveShips) -> raw moves
 
     post "/game/:gameId" $ do
         b <- body
@@ -82,9 +87,16 @@ app = do
             then do
                 raw "Get fucked! I won :)"
             else do
-                -- don't forget to damage ship  
-                -- raw (play 0 player getMoves (damageShip getMoves aliveShips))
-                (moves, aliveShips) <- webM $ gets tickCount
-                response <- liftIO (play getMoves (damageShip getMoves aliveShips))
-                webM $ modify $ \ st -> st { tickCount = (response, (damageShip getMoves aliveShips)) }
+                gameId <- param "gameId"
+                battlesStates <- webM $ gets tickCount
+
+                let battleState = Map.lookup gameId battlesStates
+                let as = case battleState of
+                        Nothing -> damageShip getMoves shipCoords
+                        Just (moves, aliveShips) -> damageShip getMoves aliveShips
+
+                response <- liftIO (play getMoves as)
+                let b1 = Map.delete gameId battlesStates
+                let b2 = Map.insert gameId (response, as) battlesStates
+                webM $ modify $ \ st -> st { tickCount = b2 }
                 raw response
