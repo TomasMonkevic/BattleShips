@@ -52,14 +52,6 @@ instance ToJSON Moves where
             String "prev",
             toJSON prev])
 
-arrayToTuple :: [a] -> Maybe (a,a)
-arrayToTuple [] = Nothing
-arrayToTuple (a1:a2:t) = Just (a1,a2)
-
-tupleToArray :: Maybe (a,a) -> [a]
-tupleToArray Nothing = []
-tupleToArray (Just v) = [fst v, snd v]
-
 allMoves :: Maybe Moves -> ([Maybe (String, String)], [Maybe (String, String)])
 allMoves moves = f moves (moveCount moves) ([],[])
     where 

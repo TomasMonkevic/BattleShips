@@ -4,17 +4,9 @@ module BattleShips where
 
 import Data.Aeson
 import Moves
-import Http
 import Data.List as L
 import System.Random
 import qualified Data.ByteString.Lazy.Char8 as LS8
-
-gameUrl :: String
-gameUrl = "http://battleship.haskell.lt/game/"
-
-gameId :: String
-gameId = "tm_justas_12"
--- gameId = "tm_test41"
 
 shipCoords :: [(String, String)]
 shipCoords = [
