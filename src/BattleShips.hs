@@ -35,11 +35,14 @@ shipCoords = [
     ("I", "9"),
     ("J", "10")]
 
+wtfBoard :: [(Char, Integer)]
+wtfBoard = (,) <$> ['A'..'J'] <*> [1..10]
+
 board :: [Maybe (String, String)]
-board = do
-    x <- ['A'..'J']
-    y <- [1..10]
-    return (Just ([x], show y))
+board = map f wtfBoard 
+    where
+        f :: (Char, Integer) -> Maybe (String, String)
+        f (c, i) = Just ([c], show i)
 
 availableMoves :: Maybe Moves -> Integer -> [Maybe (String, String)]
 availableMoves moves player = 
@@ -51,10 +54,10 @@ availableMoves moves player =
             f :: [Maybe (String, String)] -> Maybe (String, String) -> Bool
             f pm c = L.notElem c pm
 
-getNextMove :: [Maybe (String, String)] -> IO (Maybe (String, String))
-getNextMove am = do
+getRandomInt :: IO Int
+getRandomInt = do
     g <- newStdGen
-    return $ am !! (fst (randomR (0, (L.length am) - 1) g))
+    return (fst (randomR (0, (L.length board) - 1) g))
 
 isHit :: Maybe Moves -> Maybe ShotType
 isHit Nothing = Nothing
@@ -78,12 +81,10 @@ getCoords :: Maybe Moves -> Maybe (String, String)
 getCoords Nothing = Nothing
 getCoords (Just Moves { coords = c}) = c
 
-play :: Maybe Moves -> [(String, String)] -> IO (LS8.ByteString)
-play m aliveShips =
+play :: Int -> Maybe Moves -> [(String, String)] -> LS8.ByteString
+play randomInt m aliveShips =
     case (availableMoves m 1) of 
-        [] -> return "It's a draw :|"
+        [] -> "It's a draw :|"
         am2 -> case aliveShips of
-                [] -> return $ encode (Moves Nothing (isHit m) m)
-                as -> do
-                    nextMove <- getNextMove am2
-                    return $ encode (Moves nextMove (isHit m) m)
+                [] -> encode (Moves Nothing (isHit m) m)
+                as -> encode (Moves (am2 !! (randomInt `mod` L.length am2)) (isHit m) m)

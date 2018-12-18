@@ -31,6 +31,17 @@ gets f = ask >>= liftIO . readTVarIO >>= return . f
 modify :: (AppState -> AppState) -> WebM ()
 modify f = ask >>= liftIO . atomically . flip modifyTVar' f
 
+allModify :: Int -> Maybe Moves -> Text -> AppState -> AppState
+allModify randomInt getMoves gameId (AppState {webState = c}) = 
+        let 
+            battleState = Map.lookup gameId c
+            as = case battleState of
+                Nothing -> damageShip getMoves shipCoords
+                Just (moves, aliveShips) -> damageShip getMoves aliveShips
+            response = play randomInt getMoves as
+        in
+            AppState { webState = Map.insert gameId (response, as) c }
+
 app :: ScottyT Text WebM ()
 app = do
     middleware logStdoutDev
@@ -50,14 +61,5 @@ app = do
                 raw "I won :)"
             else do
                 gameId <- param "gameId"
-                battlesStates <- webM $ gets webState
-
-                let battleState = Map.lookup gameId battlesStates
-                let as = case battleState of
-                        Nothing -> damageShip getMoves shipCoords
-                        Just (moves, aliveShips) -> damageShip getMoves aliveShips
-
-                response <- liftIO (play getMoves as)
-                let updatedBattlesStates = Map.insert gameId (response, as) battlesStates
-                webM $ modify $ \ st -> st { webState = updatedBattlesStates }
-                raw response
+                randomInt <- liftIO getRandomInt
+                webM $ modify (allModify randomInt getMoves gameId)
